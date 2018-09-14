@@ -10,7 +10,8 @@ char mineIndicator = 'M';
 
 
 void setup(){
-  
+  fullScreen();
+  background(255);
   for(int i = 0; i < map_height; i++)
    for(int k = 0; k < map_width; k++){
     map[i][k] = '0';
@@ -37,6 +38,24 @@ void setup(){
 }
 
 void draw(){
+  int block_px_size = 50;
+  int border_x = block_px_size * map_width;
+  int border_y = block_px_size * map_height;
+  fill(255);
+  strokeWeight(4);
+  rect(0, 0, border_x, border_y);
+  
+  for(int i = 1; i < map_width; i++){ //columns
+    strokeWeight(2);
+    fill(100);
+    line(block_px_size * i, 0, block_px_size * i, border_y);
+  }
+  for(int i = 1; i < map_height; i++){ //columns
+    strokeWeight(2);
+    fill(100);
+    line(0, block_px_size * i, border_x, block_px_size * i);
+  }  
+  
   
 }
 
