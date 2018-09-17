@@ -1,16 +1,20 @@
 int map_width = 16;
 int map_height = 16;
 
-int mine_count = 40;
-int block_px_size = 60;
+int mine_count = ((int)round((float)Math.sqrt(map_width * map_height))) * 2;
+int block_px_size = 0;
 
 int border_y_i = 0;
 int border_x_i = 0;
 int border_y_f = 0;
 int border_x_f = 0;
 
-int width_count = map_width*block_px_size;
-int height_count = map_height*block_px_size;
+int margin_px = 100;
+
+Coordinate ending_coords = new Coordinate(0, 0);
+
+int width_count = 0;
+int height_count = 0;
 
 
 char [][] map = new char[map_height][map_width];
@@ -18,6 +22,7 @@ boolean [][] map_revealed = new boolean[map_height][map_width];
 boolean [][] map_flagged = new boolean[map_height][map_width];
 
 boolean game_over = false;
+boolean game_complete = false;
 boolean first_click = false;
 
 
@@ -35,6 +40,9 @@ void setup() {
       map_flagged[i][k] = false;
     }
   
+  block_px_size = ((height-margin_px)/map_height);
+  width_count = map_width*block_px_size;
+  height_count = map_height*block_px_size;
   border_x_i = (width-width_count) / 2;
   border_y_i = (height-height_count) / 2;
   border_x_f = border_x_i + width_count;
@@ -70,11 +78,12 @@ Coordinate weightedRandomPlacement(Coordinate c, int range_min){
 }
 
 void draw() {
-  if (gameIsFinished()) {
-    text("gg", 100, 100);
-    return;
-  }
   background(255);
+  if (gameIsFinished()) {
+    textSize(70);
+    text("gg", Math.abs(ending_coords.x()-border_x_i) < Math.abs(ending_coords.x()-border_x_f)?border_x_i - (width/10) 
+                                                        : border_x_f + (width/10), ending_coords.y());
+  }
   
   fill(255);
   strokeWeight(4);
@@ -119,19 +128,27 @@ void draw() {
 }
 
 boolean gameIsFinished() {
-  int c = 0;
-  for (int i = 0; i < map_height; i++)
-    for (int k = 0; k < map_width; k++) {
-      char p = map[i][k];
-      if (p != mineIndicator && map_revealed[i][k]) c++;
+  if(!game_complete){
+    int c = 0;
+    for (int i = 0; i < map_height; i++)
+      for (int k = 0; k < map_width; k++) {
+        char p = map[i][k];
+        if (p != mineIndicator && map_revealed[i][k]) c++;
+      }
+    if (map_width * map_height - c == mine_count){
+      game_complete = true;
+      return true;
     }
-  if (map_width * map_height - c == mine_count) return true;
-  return false;
+    return false;
+  }
+  return true;
 }
 
 void mouseClicked() { //after press + release
   if ((mouseX >= border_x_i && mouseX <= border_x_f) //within game boundaries
     && (mouseY >= border_y_i && mouseY <= border_y_f)) {
+      
+      if(gameIsFinished())return;
       
       int x_pos = (mouseX-border_x_i)/block_px_size;
       int y_pos = (mouseY-border_y_i)/block_px_size;
@@ -143,11 +160,16 @@ void mouseClicked() { //after press + release
       
       char p = map[y_pos][x_pos];
       boolean reveal = map_revealed[y_pos][x_pos];
+      boolean flagged = map_flagged[y_pos][x_pos];
       if (mouseButton == LEFT) {
-        if (!reveal)
+        if (!reveal && !flagged)
           clickedReveal(y_pos, x_pos);
       } else if (mouseButton == RIGHT) {
         map_flagged[y_pos][x_pos] = !map_flagged[y_pos][x_pos];
+      }
+      
+      if(gameIsFinished()){
+       ending_coords.update_coords(mouseX, mouseY); 
       }
     }
 }
