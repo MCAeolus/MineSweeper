@@ -7,6 +7,7 @@ int block_px_size = 60;
 
 char [][] map = new char[map_height][map_width];
 boolean [][] map_revealed = new boolean[map_height][map_width];
+boolean [][] map_flagged = new boolean[map_height][map_width];
 
 boolean game_over = false;
 
@@ -20,6 +21,7 @@ void setup(){
    for(int k = 0; k < map_width; k++){
     map[i][k] = '0';
     map_revealed[i][k] = false;
+    map_flagged[i][k] = false;
    }
    
   
@@ -42,6 +44,10 @@ void setup(){
 }
 
 void draw(){
+  if(gameIsFinished()){
+   text("gg", 100, 100);
+   return;
+  }
   background(255);
   int border_x = block_px_size * map_width;
   int border_y = block_px_size * map_height;
@@ -64,6 +70,7 @@ void draw(){
     for(int k = 0; k < map_width; k++){
       char p = map[i][k];
       boolean revealed = map_revealed[i][k];
+      boolean flagged = map_flagged[i][k];
       
       int x = block_px_size * k;
       int y = block_px_size * i;
@@ -71,13 +78,30 @@ void draw(){
       int dy = block_px_size * (i+1);
       
       textSize(30);
+      fill(200);
       if(p != '0')text(p + "", x + (block_px_size*(1/3)), dy - (block_px_size/2));
       
       if(!revealed && !game_over){
-       fill(200);
-       rect(x, y, block_px_size, block_px_size);
+        if(flagged){
+          fill(color(255, 0, 0));
+          rect(x, y, block_px_size, block_px_size);
+        }else{
+         fill(200);
+         rect(x, y, block_px_size, block_px_size);
+        }
       }
     }
+}
+
+boolean gameIsFinished(){
+  int c = 0;
+  for(int i = 0; i < map_height; i++)
+    for(int k = 0; k < map_width; k++){
+      char p = map[i][k];
+      if(p != mineIndicator && map_revealed[i][k]) c++;
+    }
+   if(map_width * map_height - c == mine_count) return true;
+   return false;
 }
 
 void mouseClicked(){ //after press + release
@@ -92,28 +116,26 @@ void mouseClicked(){ //after press + release
       int y_pos = mouseY/block_px_size;
       char p = map[y_pos][x_pos];
       boolean reveal = map_revealed[y_pos][x_pos];
-      
+    if(mouseButton == LEFT){
       if(!reveal)
         clickedReveal(y_pos, x_pos);
+    }else if(mouseButton == RIGHT){
+      map_flagged[y_pos][x_pos] = !map_flagged[y_pos][x_pos];
+    }
   }
 }
 
 void clickedReveal(int height_m, int width_m){
     char p = map[height_m][width_m];
-    map_revealed[height_m][width_m] = true;
-    if(p == mineIndicator)game_over = true;
-    else if(p == '0'){
-      
-      for(int i = -1; i <= 1; i++){
-          if(checkNear('0', height_m + i, width_m)) clickedReveal(height_m + i, width_m);
-          if(checkNear('0', height_m, width_m + i)) clickedReveal(height_m, width_m + i);
+    if(map_revealed[height_m][width_m] == false){
+      map_revealed[height_m][width_m] = true;
+      if(p == mineIndicator) game_over = true;
+      else if(p == '0'){
+        if(checkNear('0', height_m+1, width_m))clickedReveal(height_m+1, width_m);
+        if(checkNear('0', height_m-1, width_m))clickedReveal(height_m-1, width_m);
+        if(checkNear('0', height_m, width_m+1))clickedReveal(height_m, width_m+1);
+        if(checkNear('0', height_m, width_m-1))clickedReveal(height_m, width_m-1);
       }
-      /*
-      if(checkNear('0', height_m+1, width_m))clickedReveal(height_m+1, width_m);
-      if(checkNear('0', height_m-1, width_m))clickedReveal(height_m-1, width_m);
-      if(checkNear('0', height_m, width_m+1))clickedReveal(height_m, width_m+1);
-      if(checkNear('0', height_m, width_m-1))clickedReveal(height_m, width_m-1);
-      */
     }
 }
 
