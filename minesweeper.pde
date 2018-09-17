@@ -14,7 +14,7 @@ char mineIndicator = 'M';
 
 
 void setup(){
-  fullScreen();
+  fullScreen(1);
   background(255);
   for(int i = 0; i < map_height; i++)
    for(int k = 0; k < map_width; k++){
@@ -103,15 +103,22 @@ void clickedReveal(int height_m, int width_m){
     map_revealed[height_m][width_m] = true;
     if(p == mineIndicator)game_over = true;
     else if(p == '0'){
+      
+      for(int i = -1; i <= 1; i++){
+          if(checkNear('0', height_m + i, width_m)) clickedReveal(height_m + i, width_m);
+          if(checkNear('0', height_m, width_m + i)) clickedReveal(height_m, width_m + i);
+      }
+      /*
       if(checkNear('0', height_m+1, width_m))clickedReveal(height_m+1, width_m);
       if(checkNear('0', height_m-1, width_m))clickedReveal(height_m-1, width_m);
       if(checkNear('0', height_m, width_m+1))clickedReveal(height_m, width_m+1);
       if(checkNear('0', height_m, width_m-1))clickedReveal(height_m, width_m-1);
+      */
     }
 }
 
 boolean checkNear(char is, int height_m, int width_m){
- if((height_m > 0 && height_m < map_height) && (width_m > 0 && width_m < map_width))
+ if((height_m >= 0 && height_m < map_height) && (width_m >= 0 && width_m < map_width))
   if(map[height_m][width_m]== is) return true;
  return false;
 }
