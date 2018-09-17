@@ -1,5 +1,5 @@
-int map_width = 16;
-int map_height = 16;
+int map_width = 10;
+int map_height = 10;
 
 int mine_count = ((int)round((float)Math.sqrt(map_width * map_height))) * 2;
 int block_px_size = 0;
@@ -9,7 +9,7 @@ int border_x_i = 0;
 int border_y_f = 0;
 int border_x_f = 0;
 
-int margin_px = 100;
+int margin_px = 400;
 
 Coordinate ending_coords = new Coordinate(0, 0);
 
@@ -81,10 +81,13 @@ void draw() {
   background(255);
   if (gameIsFinished()) {
     textSize(70);
+    fill(100);
     text("gg", Math.abs(ending_coords.x()-border_x_i) < Math.abs(ending_coords.x()-border_x_f)?border_x_i - (width/10) 
                                                         : border_x_f + (width/10), ending_coords.y());
   }
-  
+  textSize(30);
+  fill(0);
+  text("Mines: " + mine_count + "|Flagged Mines: " , 0, 50);
   fill(255);
   strokeWeight(4);
   rect(border_x_i, border_y_i, width_count, height_count);
