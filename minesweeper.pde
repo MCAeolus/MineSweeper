@@ -1,10 +1,14 @@
 int map_width = 16;
 int map_height = 16;
 
-int mine_count = 20;
+int mine_count = 40;
+int block_px_size = 60;
+
 
 char [][] map = new char[map_height][map_width];
 boolean [][] map_revealed = new boolean[map_height][map_width];
+
+boolean game_over = false;
 
 char mineIndicator = 'M';
 
@@ -38,7 +42,7 @@ void setup(){
 }
 
 void draw(){
-  int block_px_size = 50;
+  background(255);
   int border_x = block_px_size * map_width;
   int border_y = block_px_size * map_height;
   fill(255);
@@ -50,17 +54,66 @@ void draw(){
     fill(100);
     line(block_px_size * i, 0, block_px_size * i, border_y);
   }
-  for(int i = 1; i < map_height; i++){ //columns
+  for(int i = 1; i < map_height; i++){ //rows
     strokeWeight(2);
     fill(100);
     line(0, block_px_size * i, border_x, block_px_size * i);
-  }  
+}
   
-  
+  for(int i = 0; i < map_height; i++)
+    for(int k = 0; k < map_width; k++){
+      char p = map[i][k];
+      boolean revealed = map_revealed[i][k];
+      
+      int x = block_px_size * k;
+      int y = block_px_size * i;
+      int dx = block_px_size * (k+1);
+      int dy = block_px_size * (i+1);
+      
+      textSize(30);
+      if(p != '0')text(p + "", x + (block_px_size*(1/3)), dy - (block_px_size/2));
+      
+      if(!revealed && !game_over){
+       fill(200);
+       rect(x, y, block_px_size, block_px_size);
+      }
+    }
 }
 
 void mouseClicked(){ //after press + release
-  return;
+  int borderx_i = 0;
+  int bordery_i = 0;
+  int borderx_f = block_px_size * map_width;
+  int bordery_f = block_px_size * map_height;
+  
+  if((mouseX >= borderx_i && mouseX <= borderx_f) //within game boundaries
+  && (mouseY >= bordery_i && mouseY <= bordery_f)){
+      int x_pos = mouseX/block_px_size;
+      int y_pos = mouseY/block_px_size;
+      char p = map[y_pos][x_pos];
+      boolean reveal = map_revealed[y_pos][x_pos];
+      
+      if(!reveal)
+        clickedReveal(y_pos, x_pos);
+  }
+}
+
+void clickedReveal(int height_m, int width_m){
+    char p = map[height_m][width_m];
+    map_revealed[height_m][width_m] = true;
+    if(p == mineIndicator)game_over = true;
+    else if(p == '0'){
+      if(checkNear('0', height_m+1, width_m))clickedReveal(height_m+1, width_m);
+      if(checkNear('0', height_m-1, width_m))clickedReveal(height_m-1, width_m);
+      if(checkNear('0', height_m, width_m+1))clickedReveal(height_m, width_m+1);
+      if(checkNear('0', height_m, width_m-1))clickedReveal(height_m, width_m-1);
+    }
+}
+
+boolean checkNear(char is, int height_m, int width_m){
+ if((height_m > 0 && height_m < map_height) && (width_m > 0 && width_m < map_width))
+  if(map[height_m][width_m]== is) return true;
+ return false;
 }
 
 void mineCountPlus(int place_height, int place_width){
