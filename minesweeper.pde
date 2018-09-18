@@ -1,5 +1,5 @@
-int map_width = 10;
-int map_height = 10;
+int map_width = 16;
+int map_height = 16;
 
 int mine_count = ((int)round((float)Math.sqrt(map_width * map_height))) * 2;
 int block_px_size = 0;
@@ -40,7 +40,7 @@ void setup() {
       map_flagged[i][k] = false;
     }
   
-  block_px_size = ((height-margin_px)/map_height);
+  block_px_size = ((height-margin_px)/map_height);//screens are generally longer than taller, therefore height is the smaller factor than width.
   width_count = map_width*block_px_size;
   height_count = map_height*block_px_size;
   border_x_i = (width-width_count) / 2;
@@ -87,6 +87,11 @@ void draw() {
   }
   textSize(30);
   fill(0);
+  
+  for(int i = 0; i < map_height; i++)
+    
+  
+  
   text("Mines: " + mine_count + "|Flagged Mines: " , 0, 50);
   fill(255);
   strokeWeight(4);
@@ -161,7 +166,6 @@ void mouseClicked() { //after press + release
         first_click = true;
       }
       
-      char p = map[y_pos][x_pos];
       boolean reveal = map_revealed[y_pos][x_pos];
       boolean flagged = map_flagged[y_pos][x_pos];
       if (mouseButton == LEFT) {
