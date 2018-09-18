@@ -1,5 +1,5 @@
 int map_width = 16;
-int map_height = 16;
+int map_height = 18;
 
 int mine_count = ((int)round((float)Math.sqrt(map_width * map_height))) * 2;
 int block_px_size = 0;
@@ -55,7 +55,7 @@ void generateMap(int initial_x, int initial_y){
 
     Coordinate place_coordinate;
     do {
-      place_coordinate = weightedRandomPlacement(initial_coordinate, 1);
+      place_coordinate = weightedRandomPlacement(initial_coordinate, 2);
     } while (map[place_coordinate.y()][place_coordinate.x()] == mineIndicator);
 
     map[place_coordinate.y()][place_coordinate.x()] = mineIndicator;
@@ -88,11 +88,12 @@ void draw() {
   textSize(30);
   fill(0);
   
+  int flag_c = 0;
   for(int i = 0; i < map_height; i++)
-    
+    for(int k = 0; k < map_width; k++)
+      if(map_flagged[i][k]) flag_c++;
   
-  
-  text("Mines: " + mine_count + "|Flagged Mines: " , 0, 50);
+  text("Mines: " + mine_count + " | Flagged Mines: " + flag_c , 0, 50);
   fill(255);
   strokeWeight(4);
   rect(border_x_i, border_y_i, width_count, height_count);
@@ -158,8 +159,8 @@ void mouseClicked() { //after press + release
       
       if(gameIsFinished())return;
       
-      int x_pos = (mouseX-border_x_i)/block_px_size;
-      int y_pos = (mouseY-border_y_i)/block_px_size;
+      int x_pos = floor((mouseX-border_x_i)/block_px_size);
+      int y_pos = floor((mouseY-border_y_i)/block_px_size);
       
       if(!first_click){
         generateMap(x_pos, y_pos);
@@ -171,7 +172,7 @@ void mouseClicked() { //after press + release
       if (mouseButton == LEFT) {
         if (!reveal && !flagged)
           clickedReveal(y_pos, x_pos);
-      } else if (mouseButton == RIGHT) {
+      } else if (mouseButton == RIGHT && !reveal) {
         map_flagged[y_pos][x_pos] = !map_flagged[y_pos][x_pos];
       }
       
