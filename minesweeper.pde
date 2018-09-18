@@ -1,7 +1,7 @@
 int map_width = 16;
-int map_height = 18;
+int map_height = 16;
 
-int mine_count = ((int)round((float)Math.sqrt(map_width * map_height))) * 2;
+int mine_count = ((int)round((float)Math.sqrt(map_width * map_height * 3)));
 int block_px_size = 0;
 
 int border_y_i = 0;
@@ -16,6 +16,9 @@ Coordinate ending_coords = new Coordinate(0, 0);
 int width_count = 0;
 int height_count = 0;
 
+int slider_mines_percent = 0;
+int slider_height_percent = 0;
+int slider_width_percent = 0;
 
 char [][] map = new char[map_height][map_width];
 boolean [][] map_revealed = new boolean[map_height][map_width];
@@ -172,7 +175,7 @@ void mouseClicked() { //after press + release
       if (mouseButton == LEFT) {
         if (!reveal && !flagged)
           clickedReveal(y_pos, x_pos);
-      } else if (mouseButton == RIGHT && !reveal) {
+      } else if (mouseButton == RIGHT && !reveal && first_click) {
         map_flagged[y_pos][x_pos] = !map_flagged[y_pos][x_pos];
       }
       
